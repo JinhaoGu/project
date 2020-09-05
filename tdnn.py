@@ -2,6 +2,86 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
+
+
+
+class StatsPooling(nn.Module):
+    def __init__(self):
+        super(StatsPooling,self).__init__()
+
+    def forward(self,x):
+        mean = x.mean(dim=1)
+        std = x.std(dim=1)
+        x=torch.cat((mean,std),dim=1)
+        return x
+
+    
+class segment(nn.Module):
+    def __init__(
+                    self, 
+                    input_dim=24, 
+                    output_dim=512,
+                    #context_size=5,
+                    #stride=1,
+                    #dilation=1,
+                    batch_norm=True,
+                    dropout_p=0.0
+                ):
+        
+        super(segment, self).__init__()
+        #self.context_size = context_size
+        #self.stride = stride
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        #self.dilation = dilation
+        self.dropout_p = dropout_p
+        self.batch_norm = batch_norm
+      
+        self.kernel = nn.Linear(input_dim, output_dim)
+        self.nonlinearity = nn.ReLU()
+        if self.batch_norm:
+            self.bn = nn.BatchNorm1d(output_dim)
+        if self.dropout_p:
+            self.drop = nn.Dropout(p=self.dropout_p)
+        
+    def forward(self, x):
+        '''
+        input: size (batch,  input_features)
+        outpu: size (batch,  output_features)
+        '''
+
+        #_, _, d = x.shape
+        _,d = x.shape
+        assert (d == self.input_dim), 'Input dimension was wrong. Expected ({}), got ({})'.format(self.input_dim, d)
+        #x = x.unsqueeze(1)
+
+        # Unfold input into smaller temporal contexts
+#         x = F.unfold(
+#                         x, 
+#                         (self.context_size, self.input_dim), 
+#                         stride=(1,self.input_dim), 
+#                         dilation=(self.dilation,1)
+#                     )
+
+        # N, output_dim*context_size, new_t = x.shape
+        x = x.transpose(1,-1)
+        x = self.kernel(x)
+        x = self.nonlinearity(x)
+        
+        if self.dropout_p:
+            x = self.drop(x)
+
+        if self.batch_norm:
+            x = x.transpose(1,-1)
+            x = self.bn(x)
+            x = x.transpose(1,-1)
+
+        return x
+
+        
+        
+
 class TDNN(nn.Module):
     
     def __init__(
@@ -48,7 +128,8 @@ class TDNN(nn.Module):
         outpu: size (batch, new_seq_len, output_features)
         '''
 
-        _, _, d = x.shape
+        #_, _, d = x.shape
+        d = x.shape[-1]
         assert (d == self.input_dim), 'Input dimension was wrong. Expected ({}), got ({})'.format(self.input_dim, d)
         x = x.unsqueeze(1)
 
@@ -74,3 +155,4 @@ class TDNN(nn.Module):
             x = x.transpose(1,2)
 
         return x
+
