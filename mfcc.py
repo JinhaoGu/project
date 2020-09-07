@@ -6,7 +6,8 @@ import pickle
 
 from scipy.io import wavfile
 import torch
-filepath = "/Users/tanikin/projct/TIMIT/train"
+import random 
+filepath = "/Users/tanikin/projct/TIMIT/test"
 wavelist = []
 spkr = []
 dirnames = os.listdir(filepath)
@@ -30,10 +31,10 @@ for dir in dirnames:
                 MFCC = mfcc(signal, samplerate=sample_rate, numcep=24
                             , nfilt=26, nfft=1024)
 
-                mean_ = MFCC.mean(0)
-                var_  = MFCC.var(0)
-                MFCC_ = (MFCC- mean_)/var_ #normalise
-                wavelist.append(MFCC_)#save MFCC 
+                #mean_ = MFCC.mean(0)
+                #var_  = MFCC.var(0)
+                #MFCC_ = (MFCC- mean_)/var_ #normalise
+                wavelist.append(MFCC)#save MFCC 
                 spkr.append(i)
 label = []
 for fi in spkr:
@@ -42,17 +43,26 @@ for fi in spkr:
     label.append(label_)# assign label to each voice
 
 a = wavelist
-wavlist = []
+wav_list = []
 max_= len(max(wavelist,key = lambda x: len(x)))
 for wav in a:
     b = np.zeros((max_,24))
     for i,j in enumerate(wav):
         b[i][0:len(j)] = j
-    wavlist.append(b) # pad zeros to ensure each voice has the same frame number
-
+    wav_list.append(b) # pad zeros to ensure each voice has the same frame number
     
+wavlist = []
+#wav_list[0]
+for MFCC in wav_list:
+    mean_ = MFCC.mean(0)
+    #print((mean_)) 
+    var_  = MFCC.var(0)
+    MFCC_ = (MFCC- mean_)/var_ # feature normalisation 
+    wavlist.append(MFCC_)
+
 with open('test1.pkl','wb') as f:
     pickle.dump([wavlist,label],f) # save the data and label into .pkl files
     
-    
+print(np.shape(wav_list))
+print('speech data preperation completed!')
     
