@@ -11,7 +11,7 @@ Define the structure of tdnn.
 train.py
 Train the network.
 
-Usage:type "python -u train.py batch_size learning_rate | tee ~/train_log.txt".
+Usage:type "python -u train.py batch_size learning_rate | tee ~/train_log.txt" in terminal.
 The log of training process will be recorded in "train_log.txt" in the same directory.
 
 
