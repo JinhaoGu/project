@@ -1,6 +1,6 @@
 import torch
 import pickle
-import matplotlib as plt
+#import matplotlib as plt
 from tdnn import *
 import torch.nn as nn
 import torch.nn.functional as F
@@ -20,7 +20,7 @@ l_rate = float(sys.argv[2])
 
 with open('test1.pkl','rb') as f:
     X,y = pickle.load(f)
-num_epoch = 1
+num_epoch = 100
  
 trainloader = DataLoader(list(zip(X,y)), shuffle=False, batch_size=batch)
 net = nn.Sequential()
@@ -35,8 +35,8 @@ net.add_module('segment7',Segment(input_dim=512, output_dim=512))#segment2
 net.add_module('softmax',Softmax(input_dim = 512, output_dim = len(y[0])))#softmax
  
 
-if os.path.exists('trained_net.pth'):
-    net.load_state_dict(torch.load('trained_net.pth'))
+if os.path.exists('trained_net92.5.pth'):
+    net.load_state_dict(torch.load('trained_net92.5.pth'))
 
 
 
@@ -59,10 +59,12 @@ for epoch in range(1,num_epoch+1):
         labels = label.type(torch.float)
         output = net(inputs)
         #loss = nn.MSELoss(reduction='sum')
-        l = torch.sum(output*labels)#(loss(output,labels))
+        l = torch.sum(output*labels)/(batch)#(loss(output,labels))
         optimizer = optim.Adam(net.parameters(), lr=l_rate)
         net.zero_grad()
-        l.backward()
+        with torch.autograd.detect_anomaly():
+             l.backward()
+    
         optimizer.step()
         end = time.time()
         # lr.append(optimizer.lr)
@@ -76,10 +78,10 @@ for epoch in range(1,num_epoch+1):
         #     break
     if l <=0.01:
         break
-    if (epoch % 50) ==0:
-        torch.save(net.state_dict(),'trained_net.pth')
+    if (epoch % 10) ==0:
+        torch.save(net.state_dict(),"".join(('trained_net',str(epoch+2.5),'.pth')))
         print('model saved, epoch: %d'%(epoch))
-        
+ 
 # plt.figure()
 # plt.xticks(np.log([1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]), (1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1))
 # plt.xlabel('learning rate')

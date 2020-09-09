@@ -3,7 +3,18 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-
+class Softmax(nn.Module):
+    def __init__(self,input_dim = 512, output_dim=500):
+        super(Softmax,self).__init__()
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        
+        self.kernel = nn.Linear(input_dim, output_dim)
+        self.softmax = nn.Softmax(dim=1)
+    def forward(self,x):
+        x = self.kernel(x)#.double()
+        x = -torch.log(self.softmax(x))
+        return x
 
 
 class StatsPooling(nn.Module):
@@ -17,7 +28,7 @@ class StatsPooling(nn.Module):
         return x
 
     
-class segment(nn.Module):
+class Segment(nn.Module):
     def __init__(
                     self, 
                     input_dim=24, 
@@ -29,7 +40,7 @@ class segment(nn.Module):
                     dropout_p=0.0
                 ):
         
-        super(segment, self).__init__()
+        super(Segment, self).__init__()
         #self.context_size = context_size
         #self.stride = stride
         self.input_dim = input_dim
@@ -66,8 +77,8 @@ class segment(nn.Module):
 
         # N, output_dim*context_size, new_t = x.shape
         x = x.transpose(1,-1)
-        x = self.kernel(x)
-        x = self.nonlinearity(x)
+        x = self.kernel(x)#.double()
+        x = self.nonlinearity(x)#.double()
         
         if self.dropout_p:
             x = self.drop(x)
@@ -91,7 +102,7 @@ class TDNN(nn.Module):
                     context_size=5,
                     stride=1,
                     dilation=1,
-                    batch_norm=True,
+                    batch_norm= True,
                     dropout_p=0.0
                 ):
         '''
@@ -143,8 +154,8 @@ class TDNN(nn.Module):
 
         # N, output_dim*context_size, new_t = x.shape
         x = x.transpose(1,2)
-        x = self.kernel(x)
-        x = self.nonlinearity(x)
+        x = self.kernel(x)#.double()
+        x = self.nonlinearity(x)#.double()
         
         if self.dropout_p:
             x = self.drop(x)
