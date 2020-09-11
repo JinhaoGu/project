@@ -35,8 +35,8 @@ net.add_module('segment7',Segment(input_dim=512, output_dim=512))#segment2
 net.add_module('softmax',Softmax(input_dim = 512, output_dim = len(y[0])))#softmax
  
 
-if os.path.exists('trained_net92.5.pth'):
-    net.load_state_dict(torch.load('trained_net92.5.pth'))
+if os.path.exists('trained_net103.pth'):
+    net.load_state_dict(torch.load('trained_net103.pth'))
 
 
 
@@ -79,8 +79,14 @@ for epoch in range(1,num_epoch+1):
     if l <=0.01:
         break
     if (epoch % 10) ==0:
-        torch.save(net.state_dict(),"".join(('trained_net',str(epoch+2.5),'.pth')))
+        torch.save(net.state_dict(),"".join(('trained_net',str(epoch+3),'.pth')))
         print('model saved, epoch: %d'%(epoch))
+
+torch.save(net.state_dict(),'final_net.pth')
+print('final model saved')
+print('========================')
+
+
  
 # plt.figure()
 # plt.xticks(np.log([1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]), (1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1))
