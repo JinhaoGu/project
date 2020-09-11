@@ -16,4 +16,4 @@ The log of training process will be recorded in "train_log.txt" in the same dire
 
 trained_netxxx.pth 
 
-network parameters of xvector. The network is defined in tdnn.py
+trained network parameters of xvector. The network is defined in tdnn.py
