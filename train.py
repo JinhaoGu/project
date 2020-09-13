@@ -18,7 +18,7 @@ batch = int(sys.argv[1])
 l_rate = float(sys.argv[2])
 
 
-with open('test1.pkl','rb') as f:
+with open('train.pkl','rb') as f:
     X,y = pickle.load(f)
 num_epoch = 100
  
@@ -32,11 +32,20 @@ net.add_module('frame5', TDNN(input_dim=512, output_dim=1500, context_size=1, di
 net.add_module('pool',StatsPooling())#pooling
 net.add_module('segment6',Segment(input_dim=3000, output_dim=512))#segment1
 net.add_module('segment7',Segment(input_dim=512, output_dim=512))#segment2
+
+
+if os.path.exists('final_net.pth'):
+    save_model = torch.load('final_net.pth')
+
+model_dict = net.state_dict()
+state_dict = {k:v for k,v in save_model.items() if k in model_dict.keys()}
+model_dict.update(state_dict)
+net.load_state_dict(model_dict)
+
 net.add_module('softmax',Softmax(input_dim = 512, output_dim = len(y[0])))#softmax
  
 
-if os.path.exists('trained_net103.pth'):
-    net.load_state_dict(torch.load('trained_net103.pth'))
+
 
 
 
