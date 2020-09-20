@@ -19,8 +19,8 @@ for dir in dirnames:
     for filename in os.listdir(os.path.join(filepath, dir)):
         if filename == '.DS_Store':
             continue
-        i+=1
-        spkr.append(i)
+#         i+=1
+#         spkr.append(i)
         for file in os.listdir(os.path.join(filepath, dir, filename)):
             if file == '.DS_Store':
                 continue
@@ -36,10 +36,12 @@ for dir in dirnames:
                 #MFCC_ = (MFCC- mean_)/var_ #normalise
                 wavelist.append(MFCC)#save MFCC 
                 spkr.append(i)
+        i+=1
+
 label = []
 for fi in spkr:
-    label_ = np.zeros(max(spkr))
-    label_[fi-1] = 1
+    label_ = np.zeros(max(spkr)+1)
+    label_[fi] = 1
     label.append(label_)# assign label to each voice
 
 a = wavelist
@@ -60,9 +62,15 @@ for MFCC in wav_list:
     MFCC_ = (MFCC- mean_)/var_ # feature normalisation 
     wavlist.append(MFCC_)
 
-with open('test1.pkl','wb') as f:
-    pickle.dump([wavlist,label],f) # save the data and label into .pkl files
-    
-print(np.shape(wav_list))
+p=list(zip(wavlist,label))
+
+f = open('train_.pkl','wb')
+for wav,lab in p:
+    pickle.dump([wav,lab],f) # save the data and label into .pkl files
+f.close()
+
+with open('utt_num.pkl','wb') as f:
+    pickle.dump(np.shape(wavlist)[0],f)
+print(np.shape(wavlist))
 print('speech data preperation completed!')
     

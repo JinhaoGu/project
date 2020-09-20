@@ -9,8 +9,8 @@ class Softmax(nn.Module):
         self.input_dim = input_dim
         self.output_dim = output_dim
         
-        self.kernel = nn.Linear(input_dim, output_dim)
-        self.softmax = nn.Softmax(dim=1)
+        self.kernel = nn.Linear(input_dim, output_dim).cuda()
+        self.softmax = nn.Softmax(dim=1).cuda()
     def forward(self,x):
         x = self.kernel(x)#.double()
         x = -torch.log(self.softmax(x))
@@ -50,9 +50,9 @@ class Segment(nn.Module):
         self.batch_norm = batch_norm
       
         self.kernel = nn.Linear(input_dim, output_dim)
-        self.nonlinearity = nn.ReLU()
+        self.nonlinearity = nn.ReLU().cuda()
         if self.batch_norm:
-            self.bn = nn.BatchNorm1d(output_dim)
+            self.bn = nn.BatchNorm1d(output_dim).cuda()
         if self.dropout_p:
             self.drop = nn.Dropout(p=self.dropout_p)
         
@@ -126,10 +126,10 @@ class TDNN(nn.Module):
         self.dropout_p = dropout_p
         self.batch_norm = batch_norm
       
-        self.kernel = nn.Linear(input_dim*context_size, output_dim)
-        self.nonlinearity = nn.ReLU()
+        self.kernel = nn.Linear(input_dim*context_size, output_dim).cuda()
+        self.nonlinearity = nn.ReLU().cuda()
         if self.batch_norm:
-            self.bn = nn.BatchNorm1d(output_dim)
+            self.bn = nn.BatchNorm1d(output_dim).cuda()
         if self.dropout_p:
             self.drop = nn.Dropout(p=self.dropout_p)
         
